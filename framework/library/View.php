@@ -12,6 +12,8 @@ namespace framework;
 class View
 {
 
+    protected $app;
+
     // 视图实例
     protected static $instance;
 
@@ -27,10 +29,11 @@ class View
 
     function __construct()
     {
-        $this->module = MODULE_NAME;
-        $this->controller = CONTROLLER_NAME;
-        $this->method = METHOD_NAME;
-        $this->compile_dir = RUNTIME_PATH . 'temp';
+        $app =$this-> app = App::getInstance();
+        $this->module = $app::$module;
+        $this->controller = $app::$controller;
+        $this->method = $app::$method;
+        $this->compile_dir = $app->getRuntimePath() . 'temp';
     }
 
     /**
@@ -66,7 +69,7 @@ class View
     public function display($template = '', $module_name = '')
     {
         if (strpos($template, '_dispatch_jump') !== false) {
-            $tpl_file = TPL_PATH.'dispatch_jump.tpl';
+            $tpl_file = $this->app->getFrameworkPath().'tpl/dispatch_jump.tpl';
         } else {
             if (empty($template)) {
                 $template = $this->method;
@@ -74,7 +77,7 @@ class View
             if (empty($module_name)) {
                 $module_name = $this->module;
             }
-            $tpl_file = APP_PATH . $module_name . DS . 'view' . DS . strtolower($this->controller) . DS . $template . '.html';
+            $tpl_file = $this->app->getAppPath() . $module_name . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . strtolower($this->controller) . DIRECTORY_SEPARATOR . $template . '.html';
         }
 
         //模板文件
@@ -97,7 +100,7 @@ class View
     public function fetch($template = '', $module_name = '')
     {
         if (strpos($template, '_dispatch_jump') !== false) {
-            $tpl_file = TPL_PATH.'dispatch_jump.tpl';
+            $tpl_file =  $this->app->getFrameworkPath().'tpl/dispatch_jump.tpl';
         } else {
             if (empty($template)) {
                 $template = $this->method;
@@ -105,7 +108,7 @@ class View
             if (empty($module_name)) {
                 $module_name = $this->module;
             }
-            $tpl_file = APP_PATH . $module_name . DS . 'view' . DS . strtolower($this->controller) . DS . $template . '.html';
+            $tpl_file = $this->app->getAppPath() . $module_name . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . strtolower($this->controller) . DIRECTORY_SEPARATOR . $template . '.html';
         }
 
         //模板文件
@@ -176,7 +179,7 @@ class View
             }
         }
 
-        $layout_content = file_get_contents(ROOT_PATH . './layout/' . trim($layout_name) . '.html');
+        $layout_content = file_get_contents($this->app->getRootPath() . './layout/' . trim($layout_name) . '.html');
 
         $arr_layout_content = explode("\n", $layout_content);
 

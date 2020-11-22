@@ -10,13 +10,8 @@
 function model($model_name)
 {
     $class_name = ucfirst($model_name) . 'Model';
-    $model_path = APP_PATH . $model_name . '/model/' . $class_name . '.php';
     $class_name = "app\\{$model_name}\\model\\{$class_name}";
-    if (is_file($model_path)) {
-        return new $class_name();
-    } else {
-        return new \framework\Model($model_name);
-    }
+    return new $class_name();
 
 }
 
@@ -29,29 +24,7 @@ function json($val)
 
 function url($path, $vars = null)
 {
-    $arr_path = array_filter(explode('/', $path));
-    $count = count($arr_path);
-
-    if ($count == 1) {
-        $url = '?s=' . MODULE_NAME . '/' . CONTROLLER_NAME . '/' . $path;
-    }
-    if ($count == 2) {
-        list($controller, $method) = $arr_path;
-        $url = '?s=' . MODULE_NAME . '/' . $controller . '/' . $method;
-    }
-    if ($count == 3) {
-        list($module, $controller, $method) = $arr_path;
-        $url = '?s=' . $module . '/' . $controller . '/' . $method;
-    }
-    if (!empty($vars)) {
-        if (is_array($vars)) {
-            $url .= '&' . http_build_query($vars);
-        }
-        if (is_string($vars)) {
-            $url .= '&' . $vars;
-        }
-    }
-    return $url;
+    \framework\Url::parseUrl($path,$vars);
 }
 
 function cache($key, $val = null)
@@ -66,22 +39,7 @@ function cache($key, $val = null)
 
 function session($key, $val = null)
 {
-    if ($key == null) {
-        $_SESSION = array();
-        return;
-    }
-    if (!isset($_SESSION)) {
-        session_start();
-    }
-    if (isset($val)) {
-        $_SESSION[$key] = $val;
-    } else {
-        if (isset($_SESSION[$key])) {
-            return $_SESSION[$key];
-        } else {
-            return null;
-        }
-    }
+   \framework\Session::get($key,$val);
 }
 
 function cookie($key, $val = null)

@@ -28,7 +28,7 @@ class Log
             $filename=date('y_m_d');
         }
 
-        $log_file = RUNTIME_PATH . '/log/' . $filename . '.log';
+        $log_file =  App::getInstance()->getRuntimePath() . 'log/' . $filename . '.log';
         $log_dir = dirname($log_file);
         if (!is_dir($log_dir)) {
             mkdir($log_dir, 0755, true);

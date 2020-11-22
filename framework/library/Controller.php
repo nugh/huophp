@@ -15,11 +15,14 @@ class Controller
      * @var View
      */
     protected $view;
+    
+    protected $request;
 
     // 构造函数，初始化属性，并实例化对应模型
     function __construct()
     {
         $this->view = View::instance();
+        $this->request = Request::instance();
         $this->initialize();
     }
 
@@ -68,7 +71,7 @@ class Controller
             'wait' => $wait,
         ];
 
-        if(IS_AJAX){
+        if($this->request->isAjax()){
             json($result);
         }
 
@@ -89,7 +92,7 @@ class Controller
     protected function error($msg = '', $url = null, $data = '', $wait = 3, array $header = [])
     {
         if (is_null($url)) {
-            $url = IS_AJAX ? '' : 'javascript:history.back(-1);';
+            $url = $this->request->isAjax() ? '' : 'javascript:history.back(-1);';
         }
 
         $result = [
@@ -100,7 +103,7 @@ class Controller
             'wait' => $wait,
         ];
 
-        if(IS_AJAX){
+        if($this->request->isAjax()){
             json($result);
         }
 

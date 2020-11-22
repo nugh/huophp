@@ -9,39 +9,198 @@
 namespace framework;
 
 
-class App
+class App extends Container
 {
+
+    const VERSION = '0.0.1';
+
+    /**
+     * 应用根目录
+     * @var string
+     */
+    protected $rootPath = '';
+
+    /**
+     * 框架目录
+     * @var string
+     */
+    protected $frameworkPath = '';
+
+    /**
+     * 应用目录
+     * @var string
+     */
+    protected $appPath = '';
+
+    /**
+     * Runtime目录
+     * @var string
+     */
+    protected $runtimePath = '';
 
     public static $module;
     public static $controller;
     public static $method;
 
     /**
+     * 架构方法
+     * @access public
+     */
+    public function __construct()
+    {
+        $this->frameworkPath   = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+        $this->rootPath    = dirname($this->frameworkPath) . DIRECTORY_SEPARATOR;
+        $this->appPath     = $this->rootPath . 'app' . DIRECTORY_SEPARATOR;
+        $this->runtimePath = $this->rootPath . 'runtime' . DIRECTORY_SEPARATOR;
+
+        static::setInstance($this);
+    }
+
+
+    /**
+     * 获取框架版本
+     * @access public
+     * @return string
+     */
+    public function version()
+    {
+        return static::VERSION;
+    }
+
+    /**
+     * 获取应用根目录
+     * @access public
+     * @return string
+     */
+    public function getRootPath()
+    {
+        return $this->rootPath;
+    }
+
+    /**
+     * 获取应用基础目录
+     * @access public
+     * @return string
+     */
+    public function getBasePath()
+    {
+        return $this->rootPath . 'app' . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * 获取当前应用目录
+     * @access public
+     * @return string
+     */
+    public function getAppPath()
+    {
+        return $this->appPath;
+    }
+
+    /**
+     * 设置应用目录
+     * @param string $path 应用目录
+     */
+    public function setAppPath($path)
+    {
+        $this->appPath = $path;
+    }
+
+    /**
+     * 获取应用运行时目录
+     * @access public
+     * @return string
+     */
+    public function getRuntimePath()
+    {
+        return $this->runtimePath;
+    }
+
+    /**
+     * 设置runtime目录
+     * @param string $path 定义目录
+     */
+    public function setRuntimePath($path)
+    {
+        $this->runtimePath = $path;
+    }
+
+    /**
+     * 获取核心框架目录
+     * @access public
+     * @return string
+     */
+    public function getFrameworkPath()
+    {
+        return $this->frameworkPath;
+    }
+
+    /**
+     * 获取应用配置目录
+     * @access public
+     * @return string
+     */
+    public function getConfigPath()
+    {
+        return $this->rootPath . 'config' . DIRECTORY_SEPARATOR;
+    }
+
+    /**
      * 执行应用程序
      */
-    public static function run()
+    public function run()
     {
-        //设置调试模式
-        if (!Config::get('app_debug')) {
-            ini_set('display_errors', 'Off');
-        } elseif (PHP_SAPI != 'cli') {
-            //重新申请一块比较大的buffer
-            if (ob_get_level() > 0) {
-                $output = ob_get_clean();
-            }
-            ob_start();
-            if (!empty($output)) {
-                echo $output;
-            }
-        }
 
-        //设置时区
-        date_default_timezone_set('Asia/Shanghai');
+        //初始化
+        $this->initialize();
 
         //执行
         self::exec();
+
+        //重新申请一块比较大的buffer
+        if (ob_get_level() > 0) {
+            $output = ob_get_clean();
+        }
+        ob_start();
+        if (!empty($output)) {
+            echo $output;
+        }
+
     }
 
+
+    /**
+     * 初始化
+     */
+    public function initialize()
+    {
+
+        // 加载全局初始化文件
+        $this->load();
+
+        //加载用户自定义配置
+        Config::set(include $this->getConfigPath() . 'config.php');
+
+        date_default_timezone_set( 'Asia/Shanghai');
+    }
+
+
+    /**
+     * 加载应用文件和配置
+     * @access protected
+     * @return void
+     */
+    protected function load()
+    {
+        $appPath = $this->appPath;
+
+        if (is_file($appPath . 'common.php')) {
+            include_once $appPath . 'common.php';
+        }
+
+        include_once $this->frameworkPath . 'helper.php';
+
+    }
 
 
     //解析url
@@ -63,9 +222,9 @@ class App
         $controller=ucfirst($controller);
         $action=strtolower($action);
 
-        define('MODULE_NAME',$module);
-        define('CONTROLLER_NAME',$controller);
-        define('METHOD_NAME',$action);
+        self::$module=$module;
+        self::$controller=$controller;
+        self::$method=$action;
 
         if (in_array($module, array('common'))) {//禁止访问的模块
             exit("module {$module} is not find !");

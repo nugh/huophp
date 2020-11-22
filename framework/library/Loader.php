@@ -22,13 +22,15 @@ class Loader
     //自动加载
     public static function autoload($class)
     {
+        $lib_path = __DIR__ . DIRECTORY_SEPARATOR;
+        $root_path = $lib_path.'../../';
         $name = strstr($class, '\\', true);
-        if (in_array($name, ['framework']) || is_dir(LIB_PATH . $name)) {
+        if (in_array($name, ['framework']) || is_dir($lib_path . $name)) {
             $class = str_replace('framework\\', '', $class);
-            $file = str_replace('\\', '/', LIB_PATH . $class . '.php');
+            $file = str_replace('\\', '/', $lib_path . $class . '.php');
         } else {
 //            $class=str_replace('app\\', 'application\\',$class);
-            $file = str_replace('\\', '/', ROOT_PATH . $class . '.php');
+            $file = str_replace('\\', '/', $root_path . $class . '.php');
         }
         if (is_file($file)) {
             include $file;

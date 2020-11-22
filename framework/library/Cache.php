@@ -11,7 +11,7 @@ namespace framework;
 
 class Cache
 {
-    private static $path=RUNTIME_PATH.'cache/';
+    private static $path;
 
     public static $data = array();
 
@@ -19,9 +19,9 @@ class Cache
     protected static $instance;
 
 
-//    protected function __construct() {
-//        self::$path = RUNTIME_PATH.'cache';
-//    }
+    protected function __construct() {
+        self::$path = App::getInstance()->getRuntimePath().'cache';
+    }
 
 
     /**

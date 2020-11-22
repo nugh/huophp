@@ -6,11 +6,11 @@
  * Time: 10:09
  */
 
-
 namespace framework;
 
-// 定义应用目录
-define('APP_PATH', __DIR__ . '/../app/');
+// 载入Loader类
+require __DIR__ . '/../framework/autoload.php';
 
-require __DIR__.'/../framework/base.php';
+// 执行应用
+(new App)-> run();
 
